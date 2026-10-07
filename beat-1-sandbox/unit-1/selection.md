@@ -1,14 +1,5 @@
 # Unit 1 — Issue Selection
 
-Path: `beat-1-sandbox/unit-1/selection.md`
-
-Record of the issue carried into Unit 2, and of the evaluation runs that produced
-`eval-run.txt`. This file is graded at the path above; a copy kept anywhere else in
-the repository is not read.
-
-Complete every labelled field below. Each is graded on its own; content placed under the
-wrong label is not graded.
-
 ---
 
 ## Selected issue
@@ -198,6 +189,3 @@ This is also the basis for the claim comment you write in Unit 2.
 3. **Difficulty in claiming.** Nobody has claimed it yet, so I will be the first to comment. I have not written a claim comment before, so I will need the Unit 2 voice guide to write a good one. Another classmate may claim it before me, but the house rule says that does not block me.
 
 ---
-
-Related paths: `eval-run.txt` in this directory; your skill's files in
-`tools/issue-select/`.

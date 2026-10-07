@@ -1,7 +1,5 @@
 # Unit 2 — Claim and Reproduce
 
-Path: `beat-1-sandbox/unit-2/reproduction.md`
-
 ---
 
 ## Your identity upstream

@@ -219,3 +219,69 @@ check the CI result on the PR in Unit 4.
 The posted plan comment is still true, so I am not posting a
 correction. I will post the before and after output on the issue, as
 the comment promised.
+
+### Unit 4 changes (2026-10-14)
+
+**1. The test seam changed.** Approach step 3 said the fake session's
+`execute` runs `coercions.expect(roles.StatementRole, statement)` from
+`sqlalchemy.sql`. That is a private SQLAlchemy module. My Unit 3
+feedback pointed out that a test that reaches into a library's
+internals tends to break on an unrelated upgrade. So I moved the test
+to a public seam:
+
+- Test 1 now runs the probe through a real SQLAlchemy `Session` on
+  in-memory SQLite (`create_engine("sqlite://")`). It uses Python's
+  built-in `sqlite3` driver, so there is still no new dependency and no
+  `pyproject.toml` change. A real `Session.execute` rejects a plain
+  string with the same `ArgumentError` as `AsyncSession.execute`.
+- Test 1 also checks the outcome my repro showed: it captures the logs
+  with `structlog.testing.capture_logs` and asserts there is no
+  `postgres_health_check_failed` entry, then asserts
+  `"postgres" == "healthy"`.
+- Test 2 (the `OSError` control) is unchanged.
+
+This is a third commit, after the two the plan named:
+`d9399fc test(api): use a real SQLAlchemy session in the /health probe test`.
+The files are the same two as in the plan.
+
+Before and after, with the old `health.py` restored from `main` for
+the before run:
+
+- Before: test 1 FAILED on `assert failures == []`, with
+  `'error': "Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')", 'event': 'postgres_health_check_failed'`.
+  Test 2 passed.
+- After: `2 passed`.
+
+The risk "The test uses an internal SQLAlchemy module" no longer
+applies, and the `aiosqlite` fallback is not needed. My posted plan
+comment still describes the old seam, so the PR description says the
+seam changed and why.
+
+**2. `make typecheck` now passes.** The numpy error came from my
+Python 3.12 venv, which installed numpy 2.5.3. I made a second venv on
+Python 3.11, the version CI uses, outside the repo
+(`../venv311-pathreview`), with `pip install -e ".[dev]"`. It installed
+numpy 2.4.6. Then `make typecheck VENV_BIN=../venv311-pathreview/Scripts`
+gave `Success: no issues found in 76 source files`, with no flag and no
+repo change.
+
+**3. Repo checks on Python 3.11, on the branch:**
+
+- `make lint`: `All checks passed!` (`black --check .`: 111 files left unchanged)
+- `make test-unit`: `377 passed, 53 xfailed`, 0 failed
+- `make test-integration`: `no tests ran`, `Error 5`. `tests/integration/`
+  has no tests yet; CI treats this exit code as a pass.
+- Repro re-run on the branch: `503` with `"postgres":"healthy"` and
+  `"redis":"unhealthy"` (#62), request_id
+  `ce404e4b-615c-4bbc-a381-a60ffe8f5e93`, and no
+  `postgres_health_check_failed` line in the log.
+- Control re-run on the branch (test plan item 2): `with text(): 1`, and
+  the plain string still raises the same `ArgumentError`.
+- Frontend check (`npm test -- --run`, which CONTRIBUTING lists but my
+  test plan did not name): this branch changes no file under
+  `frontend/`. On my machine (Node v24.21.0), the existing test
+  `validates portfolio URL character limit` times out at vitest's
+  default 5 s. With `--testTimeout=30000` on the command line, all 18
+  tests pass. I did not change that test.
+
+I will still check the CI result on the PR once it opens.

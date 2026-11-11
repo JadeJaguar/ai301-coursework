@@ -1,12 +1,5 @@
 # Contribution: Proper error handling missing when output zarr file exists
 
-Path: `beat-2-contribution/contribution-story.md`
-
-This file is Assignment 5, and it is graded at the path above; a copy kept anywhere else in
-the repository is not read. **Keep every section header below under its exact name** — the
-format criteria grade exactly that. Your course repo link is the whole submission: no tool
-files and no evidence uploads are part of Assignment 5.
-
 **Contribution Number:** [1]
 
 **Student:** Iman
@@ -16,13 +9,6 @@ files and no evidence uploads are part of Assignment 5.
 **Issue:** https://github.com/ecmwf/WeatherGenerator/issues/1575
 
 **Pull Request:** [GitHub PR link, once opened]
-
-One repository, built across units 5 to 8, telling the whole story of your real
-contribution. Fill it as you work, not at the end — the sections below ask for evidence that
-is far easier to write down as it happens than to reconstruct in the last weekend.
-
-Contribution Number stays `[1]` unless you make more than one contribution this term; it
-just numbers them.
 
 ---
 

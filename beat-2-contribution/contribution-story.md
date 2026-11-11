@@ -126,31 +126,79 @@ I claimed the issue on 2026-11-11: https://github.com/ecmwf/WeatherGenerator/iss
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+- OS: Windows 11 (Microsoft Windows 10.0.26200.9711), using Git Bash. The issue's traceback came from a Linux cluster; I tested on Windows only.
+- Project: my fork of ecmwf/WeatherGenerator, `develop` at 3508fa9858fc61db0889e8d0e68051fa1c506c23 (2026-11-09).
+- Python 3.12.10, uv 0.13.7, zarr 3.1.6.
+
+I used a small setup with only the `common` package, because that is where the code for this bug lives:
+
+```bash
+uv venv -p 3.12 .venv-repro
+uv pip install -p .venv-repro -e packages/common
+```
+
+Challenges: the repo's full setup (`./scripts/actions.sh sync`) pulls in torch and GPU packages, and another contributor hit download and disk space problems with it on #2621. This bug does not need any of that, so I skipped it. The `common` package needs Python 3.12 exactly (>=3.12,<3.13), so I asked uv for 3.12 by name. I also added `.venv-repro` and my local `CLAUDE.local.md` to `.git/info/exclude` so they never end up in a commit. uv was not installed at first (`uv: command not found` in Git Bash), so I installed it in PowerShell with `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` and opened a new Git Bash window so it was on my PATH. After that, the install ran with no errors.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. On a branch of my fork, add `repro/repro_1575.py`. It makes a new local zarr store in a temp folder, makes one output item (`ItemKey(sample=0, forecast_step=1, stream="ERA5")`, no datasets), and calls `write_zarr(item)` twice on the same store.
+2. Run it normally: `.venv-repro/Scripts/python repro/repro_1575.py`
+3. Run it again with asserts removed: `.venv-repro/Scripts/python -O repro/repro_1575.py`
+4. Observed result: the first write works both times. The second write raises `AssertionError: Group already exists, stop overwriting` in the normal run, and zarr's `ContainsGroupError` in the `-O` run. Neither run raises a `ValueError`.
+
+The script:
+
+```python
+"""Repro for ecmwf/WeatherGenerator#1575: write the same output item twice."""
+import pathlib
+import tempfile
+
+from weathergen.common.io import ItemKey, OutputItem, zarrio_writer
+
+store = pathlib.Path(tempfile.mkdtemp()) / "out.zarr"
+key = ItemKey(sample=0, forecast_step=1, stream="ERA5")
+item = OutputItem(key=key, forecast_offset=None)
+
+with zarrio_writer(store) as zio:
+    zio.write_zarr(item)
+    print("first write ok:", key.path)
+    try:
+        zio.write_zarr(item)
+        print("second write: no error")
+    except Exception as e:
+        print(f"second write raised {type(e).__name__}: {e}")
+print("python -O active:", not __debug__)
+```
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** https://github.com/JadeJaguar/WeatherGenerator/commit/1ee396bba6a35e7fc6f50a57f7f8091e4a6dfbd2 (branch `repro/1575-zarr-overwrite`)
+- **Screenshots/logs:** output of both runs. In the `-O` output I replaced my Windows username and the temp folder name with `<user>` and `<tmp>`, as CONTRIBUTING.md asks.
+
+  Normal run:
+
+  ```text
+  first write ok: 0/ERA5/1
+  second write raised AssertionError: Group already exists, stop overwriting
+  python -O active: False
+  ```
+
+  With `python -O`:
+
+  ```text
+  first write ok: 0/ERA5/1
+  second write raised ContainsGroupError: A group exists in store LocalStore('file://C:/Users/<user>/AppData/Local/Temp/<tmp>/out.zarr') at path '0/ERA5/1'.
+  python -O active: True
+  ```
+
+- **My findings:** The bug is still real on `develop`: writing the same output item twice never raises the `ValueError` that grassesi asked for. The code changed after the issue was filed. #1450 added an `assert` in `_get_group` (packages/common/src/weathergen/common/io.py, line 430), so a normal run now stops with an `AssertionError` instead of the issue's error. Under `python -O` the assert is removed and the write fails inside zarr with `ContainsGroupError`, the same error as the original report. So the remaining fix is to replace the assert with a `ValueError` that names the item path, as my claim says, and to add a unit test. One thing for the next unit: CI only runs `pytest src/`, so I need to ask the maintainers where an io.py test should live.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: repro-check, which graded my claim comment and my repro report together.
+- What it produced: accept on all 10 checks. It fetched my public repro commit to confirm the script matched my steps, and checked the assert at io.py:430 on the same commit.
+- Difficulties: it caught three things I had missed. My `-O` output showed my Windows username, which CONTRIBUTING.md asks people not to share. My claim and my report described the fix differently ("the item path" against "the store and the item path"). And I tested on Windows while the issue came from a Linux cluster, which env-matches-issue let pass because the issue names no platform.
+- What changed: I redacted the path, made the report match the claim, pasted the 18-line script into the report, and added a line about the platform. Next I would change env-matches-issue to ask for the platform whenever it differs from the issue's, even when the issue does not name one.
 
 ---
 

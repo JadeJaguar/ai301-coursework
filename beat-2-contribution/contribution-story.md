@@ -55,10 +55,9 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: Built a search strategy for my issue scout and fixed its rubric with real scans**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I turned my fit profile into gh search queries and ranking filters, but my broad label searches returned mostly tiny personal repos, so I limited the queries to real orgs like pallets, pytest-dev, and deepset-ai. My first scan lost 2 of its top 5 to issues whose authors had already opened a fix PR, so I added -linked:pr to every query and changed my nobody-else-on-it check to count "I have a prototype" as a claim. When I graded my picks, I added beets #7070 as a test because I knew it was taken; the rubric rejected it on 3 checks and showed my AI policy check was too narrow, so I widened it. Checking 10 issues by hand also showed the rubric still misses "discuss in the issue before a PR" rules, which I logged for later.
 
 **Unit 6: [one line on the tool work]**
 

@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Proper error handling missing when output zarr file exists
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,10 +8,13 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+
+**Student:** Iman
+
+**GitHub Username:** JadeJaguar
+
+**Issue:** https://github.com/ecmwf/WeatherGenerator/issues/1575
+
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -79,24 +82,18 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+My two picks came from the AI301 Issue Selection site: ecmwf/WeatherGenerator#1575 and PowerGridModel/power-grid-model-io#384. In Unit 5, my issue-scout skill ran one scan of 216 open issues, kept 58 after ranking, and accepted 2 of the top 5. Then I gave it my two picks directly, and it accepted both. After the Unit 6 scope patch, I graded them again. #1575 was still an accept, with a "straightforward" difficulty note: the traceback points at _get_group in io.py, and the closed PR #2621 shows where a test can go. #384 changed from accept to reject, because the issue asks for new error types "across the repo" with no clear end point. I also learned that someone asked to work on #384 in March, so under the course rule it was already taken. I released it and chose #1575.
+
+#1575 fits me because it is a small, clear Python change. The code uses an assert to stop an output item from being written twice. A maintainer (grassesi) already said it should raise a ValueError instead. So the fix is one change in one function plus a unit test, which is close to my Unit 3 fix. It has the good first issue label and was opened by a project collaborator. Before I claimed it, I read the whole timeline myself. I found that an earlier PR (#2621) was closed because it skipped the "discuss in the issue first" step. I also found an open refactor task (#1526) that lists this fix, with two open PRs from grassesi that change the same file. My scout did not see any of this. So my claim names #2621 and asks whether a separate small fix is still welcome. From this issue I hope to learn how to work with maintainers who want to talk before a PR, how zarr stores output, and how to test an error path in a large ML repo.
+
+I claimed the issue on 2026-11-11: https://github.com/ecmwf/WeatherGenerator/issues/1575#issuecomment-6790960335
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout, with my search strategy and rubric. I graded my two picks again after the Unit 6 scope patch.
+- What it produced: accept on #1575 with a "straightforward" note pointing at _get_group in io.py and the test location from #2621. #384 flipped from accept to reject on scope-feasible, because it asks for changes "across the repo".
+- Difficulties: In Unit 5, nobody-else-on-it passed #384 even though a stranger had asked to work on it, because my rule lets old claims slide. The scout also missed #1526, an open refactor that lists #1575 and has two stalled PRs on the same file. I found it only by reading the issue timeline myself.
+- What changed: I replaced scope-fits-newcomer with scope-feasible plus a difficulty note. The new check was stricter on #384 but looser on open design edges. It also dropped the old "2 or more closed PRs" rule, so my scout no longer warns about that on its own. Next, I would make nobody-else-on-it fail on any claim that was never released, and add a check for linked tasks and open PRs that touch the same code.
 
 ---
 

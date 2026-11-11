@@ -62,11 +62,9 @@ one in the week it belongs to.
 
 I turned my fit profile into gh search queries and ranking filters, but my broad label searches returned mostly tiny personal repos, so I limited the queries to real orgs like pallets, pytest-dev, and deepset-ai. My first scan lost 2 of its top 5 to issues whose authors had already opened a fix PR, so I added -linked:pr to every query and changed my nobody-else-on-it check to count "I have a prototype" as a claim. When I graded my picks, I added beets #7070 as a test because I knew it was taken; the rubric rejected it on 3 checks and showed my AI policy check was too narrow, so I widened it. Checking 10 issues by hand also showed the rubric still misses "discuss in the issue before a PR" rules, which I logged for later.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: Put a voice guard in front of my GitHub posts and wrote a memory file for WeatherGenerator**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I merged my voice guide copies into one guide with new rules for claims, questions, and pings, and hooked it in front of every gh comment, but on Windows it first did nothing: python3 did not exist, ln -s made copies instead of links, and Claude Code ran commands through its PowerShell tool, which the Bash-only hook never sees, until I turned that tool off. My old "no promised timelines" rule also clashed with a claim's "when I will report back", so I changed it to allow a time for my next update but never a date for a finished fix. On the real claim, the guard stopped my first try because I ran it from the wrong folder and it could not find claim-draft.md, then passed it from the right folder two minutes later. For CLAUDE.local.md I ran one scoped orientation over io.py and validation_io.py, which spent most of its answer on an unrelated latent write path and guessed tests live in tests/, but actions.sh and the CI file show CI only runs pytest src/, so I recorded that, left the latent path out as out of scope, and kept the file out of git with .git/info/exclude.
 
 **Unit 7: [one line on the tool work]**
 
